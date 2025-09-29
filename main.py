@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import random
 from beehive import *
+import networkx as nx
 
 def main():
     """
@@ -13,11 +14,10 @@ def main():
     # -----------------------------
     hive = (500, 500)  # fixed hive coordinates
 
-    # Example set of flowers (⚠️ replace with real coordinates provided in dataset)
-    flowers = [
-        (100, 200), (300, 400), (700, 800),
-        (200, 700), (600, 300), (800, 500)
-    ]
+    # Generate 20 random flowers around the hive
+    random.seed()
+    flowers = [(random.randint(50, 950), random.randint(50, 950)) for _ in range(8)]
+    """flowers = [(100, 200), (200, 800), (400, 600), (500, 300), (600, 700), (700, 200), (800, 500), (150, 750)]"""
 
     POP_SIZE = 101        # 100 bees + 1 queen
     N_GENERATIONS = 200   # number of iterations
@@ -27,8 +27,11 @@ def main():
     # Initialization
     # -----------------------------
     population = generate_population(POP_SIZE, flowers)
-    history_best = []     # stores best fitness per generation
-    history_avg = []      # stores average fitness per generation
+    history_best = []
+    history_avg = []
+
+    all_bees = []         # store all bees ever created
+    all_bees.extend(population)  # add initial population
 
     # -----------------------------
     # Evolutionary Loop
@@ -62,6 +65,9 @@ def main():
             child.evaluate(flowers, hive)
             offspring.append(child)
 
+        # Add offspring to all_bees
+        all_bees.extend(offspring)
+
         # New population = elites + offspring
         population = selected + offspring
 
@@ -73,22 +79,43 @@ def main():
     print(f"Best distance found: {best_bee.distance:.2f}")
 
     # -----------------------------
+    # Visualization: Genealogy Tree
+    # -----------------------------
+    G = nx.DiGraph()
+
+    # Dictionary to access any bee by ID (includes all bees ever created)
+    bee_dict = {bee.id: bee for bee in all_bees}
+
+    # Recursive function to build genealogy from a bee
+    def add_genealogy(bee):
+        if bee.id not in G:
+            G.add_node(bee.id, label=f"Bee {bee.id} (Gen {bee.generation})")
+            for pid in bee.parents:
+                G.add_edge(pid, bee.id)
+                if pid in bee_dict:
+                    add_genealogy(bee_dict[pid])
+
+    add_genealogy(best_bee)
+
+    # Draw genealogy tree
+    pos = nx.spring_layout(G)
+    labels = nx.get_node_attributes(G, 'label')
+    nx.draw(G, pos, with_labels=True, labels=labels, node_size=500, node_color="lightblue", font_size=8)
+    plt.title("Genealogy of the Best Bee")
+    plt.show()
+
+    # -----------------------------
     # Visualization: Best Path
     # -----------------------------
     x = [hive[0]] + [flowers[i][0] for i in best_bee.path] + [hive[0]]
     y = [hive[1]] + [flowers[i][1] for i in best_bee.path] + [hive[1]]
 
-    plt.figure(figsize=(9, 7))
-
-    # First plot hive and flowers
+    plt.figure(figsize=(8, 6))
     plt.scatter(*hive, color="red", s=120, marker="s", label="Hive")
     plt.scatter([f[0] for f in flowers], [f[1] for f in flowers],
                 color="gold", s=100, marker="o", edgecolors="black", label="Flowers")
-
-    # Then plot the path of the best bee
     plt.plot(x, y, color="blue", linewidth=2, linestyle="-", label="Best Path")
-    plt.scatter(x, y, color="blue", s=40)  # path nodes in blue
-
+    plt.scatter(x, y, color="blue", s=40)
     plt.title("Path of the Best Bee")
     plt.legend()
     plt.grid(True, linestyle="--", alpha=0.5)
@@ -98,8 +125,8 @@ def main():
     # Visualization: Fitness Evolution
     # -----------------------------
     plt.figure()
-    plt.plot(history_best, label="Best Fitness")
-    plt.plot(history_avg, label="Average Fitness")
+    plt.plot(history_best, label="Best Fitness", color="blue")
+    plt.plot(history_avg, label="Average Fitness", color="orange")
     plt.title("Performance Evolution Across Generations")
     plt.xlabel("Generations")
     plt.ylabel("Fitness")

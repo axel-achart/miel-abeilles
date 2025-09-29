@@ -1,23 +1,29 @@
 import math
 import random
 
+BEE_COUNTER = 0
+
 class Bee:
-    def __init__(self, path):
+    def __init__(self, path, parents=None, generation=0):
         """
-        Initialize a bee with a given path (permutation of flower indices).
+        Bee object representing a solution (path through flowers).
         """
+        global BEE_COUNTER
         self.path = path
         self.distance = None
         self.fitness = None
+        self.parents = parents if parents else []  # genealogy tracking
+        self.id = BEE_COUNTER  # unique sequential ID
+        BEE_COUNTER += 1
+        self.generation = generation  # nouvelle info pour l'affichage
+
 
     def evaluate(self, flowers, hive):
-        """
-        Evaluate the bee by calculating the distance of its path
-        and its fitness (inverse of distance).
-        """
+        """Compute distance and fitness of a bee"""
         self.distance = calculate_distance(self.path, flowers, hive)
         self.fitness = 1 / self.distance
         return self.fitness
+
 
 
 def calculate_distance(path, flowers, hive):
@@ -59,31 +65,28 @@ def selection(population, proportion=0.5):
 
 
 def crossover(parent1, parent2):
-    """
-    Perform Order Crossover (OX) between two parents.
-    """
     n = len(parent1.path)
     start, end = sorted(random.sample(range(n), 2))
 
-    child = [None] * n
-    child[start:end] = parent1.path[start:end]
+    child_path = [None] * n
+    child_path[start:end] = parent1.path[start:end]
 
     pos = end
     for gene in parent2.path:
-        if gene not in child:
+        if gene not in child_path:
             if pos >= n:
                 pos = 0
-            child[pos] = gene
+            child_path[pos] = gene
             pos += 1
-    return Bee(child)
+
+    child_gen = max(parent1.generation, parent2.generation) + 1
+    return Bee(child_path, parents=[parent1.id, parent2.id], generation=child_gen)
 
 
 def mutation(bee, rate=0.05):
-    """
-    Mutate a bee by swapping two genes with a given probability.
-    """
     path = bee.path[:]
     if random.random() < rate:
         i, j = random.sample(range(len(path)), 2)
         path[i], path[j] = path[j], path[i]
-    return Bee(path)
+    child_gen = bee.generation + 1
+    return Bee(path, parents=[bee.id], generation=child_gen)

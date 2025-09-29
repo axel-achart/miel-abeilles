@@ -10,7 +10,7 @@ The project demonstrates how **natural selection** can be modeled computationall
 ## 🚀 Features
 ### Maze of Flowers (Problem Setting)
 - The hive is fixed.
-- Flowers are placed in the field with predefined coordinates (dataset provided in the assignment).
+- Flowers are placed in the field randomly.
 - Bees must travel from the hive, visit all flowers, and return to the hive.
 
 ### Genetic Algorithm
