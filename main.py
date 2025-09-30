@@ -96,7 +96,7 @@ def main():
     best_bee = population[0]
     print("\n=== Final Results ===")
     print(f"Best distance found: {best_bee.distance:.2f}")
-    print(f"Results saved in: {csv_filename}")
+    print(f"Results saved in data folder : {csv_filename}")
 
     # -----------------------------
     # Visualization 1: Genealogy Tree
