@@ -91,125 +91,137 @@ def main():
 
     POP_SIZE = 101
     N_GENERATIONS = 200
+    MUTATION_RATES = [0.01, 0.05, 0.1, 0.5, 0.8, 1.0]
 
     try:
-        taux_mutation = float(input("\nEnter mutation rate (ex : 0.05 for 5%) : "))
-        if not (0 <= taux_mutation <= 1):
-            raise ValueError
-        MAIN_MUTATION = taux_mutation
+        mass_testing = input("\nDo you want to test for 1k of each mutation rates (y/n) : ")
+        if mass_testing in ("y","n"):
+            if mass_testing == "y":
+                for _ in range(1000):
+                    for rate in MUTATION_RATES:
+                        best_bee, history_best,history_avg,all_bees,folder,csv_filename = run_simulation(rate,flowers,hive,POP_SIZE,N_GENERATIONS,genealogy=True)
+            elif mass_testing == "n":
+                try:
+                    taux_mutation = float(input("\nEnter mutation rate (ex : 0.05 for 5%) : "))
+                    if not (0 <= taux_mutation <= 1):
+                        raise ValueError
+                    MAIN_MUTATION = taux_mutation
+                except ValueError:
+                    print("\nInvalid input. Using default mutation rate of 0.05.")
+                    MAIN_MUTATION = 0.05
+
+                # -----------------------------
+                # Main simulation (with genealogy)
+                # -----------------------------
+                best_bee, history_best, history_avg, all_bees, folder, csv_filename = run_simulation(
+                    MAIN_MUTATION, flowers, hive, POP_SIZE, N_GENERATIONS, genealogy=True
+                )
+
+                print("\n=== Final Results ===")
+                print(f"Best distance found: {best_bee.distance:.2f}")
+                print(f"Results saved in: {csv_filename}\n")
+
+                # -----------------------------
+                # Graph 1: Genealogy Tree
+                # -----------------------------
+                G = nx.DiGraph()
+                bee_dict = {bee.id: bee for bee in all_bees}
+
+                def add_genealogy(bee):
+                    if bee.id not in G:
+                        G.add_node(bee.id, label=f"Bee {bee.id} (Gen {bee.generation})")
+                        for pid in bee.parents:
+                            G.add_edge(pid, bee.id)
+                            if pid in bee_dict:
+                                add_genealogy(bee_dict[pid])
+
+                add_genealogy(best_bee)
+
+                pos = nx.spring_layout(G)
+                labels = nx.get_node_attributes(G, 'label')
+
+                fig1 = plt.figure(figsize=(10, 6))
+                nx.draw(G, pos, with_labels=True, labels=labels,
+                        node_size=600, node_color="lightblue", font_size=8)
+                plt.title("Genealogy of the Best Bee")
+                plt.show()
+                save_plot(fig1, folder, "genealogy_tree")
+
+                # -----------------------------
+                # Graph 2: Best Path
+                # -----------------------------
+                x = [hive[0]] + [flowers[i][0] for i in best_bee.path] + [hive[0]]
+                y = [hive[1]] + [flowers[i][1] for i in best_bee.path] + [hive[1]]
+
+                fig2 = plt.figure(figsize=(10, 6))
+                plt.scatter(*hive, color="red", s=120, marker="s", label="Hive")
+                plt.scatter([f[0] for f in flowers], [f[1] for f in flowers],
+                            color="gold", s=100, marker="o", edgecolors="black", label="Flowers")
+                plt.plot(x, y, color="blue", linewidth=2, linestyle="-", label="Best Path")
+                plt.scatter(x, y, color="blue", s=40)
+                plt.title("Path of the Best Bee")
+                plt.legend()
+                plt.grid(True, linestyle="--", alpha=0.5)
+                plt.show()
+                save_plot(fig2, folder, "best_path")
+                
+
+                # -----------------------------
+                # Graph 3: Fitness Evolution
+                # -----------------------------
+                fig3 = plt.figure(figsize=(10, 6))
+                plt.plot(history_best, label="Best Fitness", color="blue")
+                plt.plot(history_avg, label="Average Fitness", color="orange")
+                plt.title(f"Performance Evolution Across Generations (Mutation {MAIN_MUTATION})")
+                plt.xlabel("Generations")
+                plt.ylabel("Fitness")
+                plt.legend()
+                plt.show()
+                save_plot(fig3, folder, "fitness_evolution")
+            
+
+                # -----------------------------
+                # Ask for mutation comparison
+                # -----------------------------
+                choice = input("\nDo you want to visualize mutation rate comparison graphs ? (y/n): ").strip().lower()
+                if choice == "y":
+                    results_best = {}
+                    results_avg = {}
+
+                    for rate in MUTATION_RATES:
+                        best, avg, folder_rate, csv_file = run_simulation(
+                            rate, flowers, hive, POP_SIZE, N_GENERATIONS
+                        )
+                        results_best[rate] = best
+                        results_avg[rate] = avg
+                        print(f"Saved results for mutation {rate} in {csv_file}")
+
+                    # Best Fitness comparison
+                    fig4 = plt.figure(figsize=(10, 6))
+                    for rate, values in results_best.items():
+                        plt.plot(values, label=f"Mutation {rate}")
+                    plt.title("Best Fitness Comparison by Mutation Rate")
+                    plt.xlabel("Generations")
+                    plt.ylabel("Best Fitness")
+                    plt.legend()
+                    plt.show()
+                    save_plot(fig4, "data", "comparison_best_fitness")
+
+                    # Average Fitness comparison
+                    fig5 = plt.figure(figsize=(10, 6))
+                    for rate, values in results_avg.items():
+                        plt.plot(values, label=f"Mutation {rate}")
+                    plt.title("Average Fitness Comparison by Mutation Rate")
+                    plt.xlabel("Generations")
+                    plt.ylabel("Average Fitness")
+                    plt.legend()
+                    plt.show()
+                    save_plot(fig5, "data", "comparison_avg_fitness")
+
+
     except ValueError:
-        print("\nInvalid input. Using default mutation rate of 0.05.")
-        MAIN_MUTATION = 0.05
-
-    # -----------------------------
-    # Main simulation (with genealogy)
-    # -----------------------------
-    best_bee, history_best, history_avg, all_bees, folder, csv_filename = run_simulation(
-        MAIN_MUTATION, flowers, hive, POP_SIZE, N_GENERATIONS, genealogy=True
-    )
-
-    print("\n=== Final Results ===")
-    print(f"Best distance found: {best_bee.distance:.2f}")
-    print(f"Results saved in: {csv_filename}\n")
-
-    # -----------------------------
-    # Graph 1: Genealogy Tree
-    # -----------------------------
-    G = nx.DiGraph()
-    bee_dict = {bee.id: bee for bee in all_bees}
-
-    def add_genealogy(bee):
-        if bee.id not in G:
-            G.add_node(bee.id, label=f"Bee {bee.id} (Gen {bee.generation})")
-            for pid in bee.parents:
-                G.add_edge(pid, bee.id)
-                if pid in bee_dict:
-                    add_genealogy(bee_dict[pid])
-
-    add_genealogy(best_bee)
-
-    pos = nx.spring_layout(G)
-    labels = nx.get_node_attributes(G, 'label')
-
-    fig1 = plt.figure(figsize=(10, 6))
-    nx.draw(G, pos, with_labels=True, labels=labels,
-            node_size=600, node_color="lightblue", font_size=8)
-    plt.title("Genealogy of the Best Bee")
-    plt.show()
-    save_plot(fig1, folder, "genealogy_tree")
-
-    # -----------------------------
-    # Graph 2: Best Path
-    # -----------------------------
-    x = [hive[0]] + [flowers[i][0] for i in best_bee.path] + [hive[0]]
-    y = [hive[1]] + [flowers[i][1] for i in best_bee.path] + [hive[1]]
-
-    fig2 = plt.figure(figsize=(10, 6))
-    plt.scatter(*hive, color="red", s=120, marker="s", label="Hive")
-    plt.scatter([f[0] for f in flowers], [f[1] for f in flowers],
-                color="gold", s=100, marker="o", edgecolors="black", label="Flowers")
-    plt.plot(x, y, color="blue", linewidth=2, linestyle="-", label="Best Path")
-    plt.scatter(x, y, color="blue", s=40)
-    plt.title("Path of the Best Bee")
-    plt.legend()
-    plt.grid(True, linestyle="--", alpha=0.5)
-    plt.show()
-    save_plot(fig2, folder, "best_path")
-    
-
-    # -----------------------------
-    # Graph 3: Fitness Evolution
-    # -----------------------------
-    fig3 = plt.figure(figsize=(10, 6))
-    plt.plot(history_best, label="Best Fitness", color="blue")
-    plt.plot(history_avg, label="Average Fitness", color="orange")
-    plt.title(f"Performance Evolution Across Generations (Mutation {MAIN_MUTATION})")
-    plt.xlabel("Generations")
-    plt.ylabel("Fitness")
-    plt.legend()
-    plt.show()
-    save_plot(fig3, folder, "fitness_evolution")
- 
-
-    # -----------------------------
-    # Ask for mutation comparison
-    # -----------------------------
-    choice = input("\nDo you want to visualize mutation rate comparison graphs ? (y/n): ").strip().lower()
-    if choice == "y":
-        mutation_rates = [0.01, 0.05, 0.1, 0.5, 0.8, 1.0]
-        results_best = {}
-        results_avg = {}
-
-        for rate in mutation_rates:
-            best, avg, folder_rate, csv_file = run_simulation(
-                rate, flowers, hive, POP_SIZE, N_GENERATIONS
-            )
-            results_best[rate] = best
-            results_avg[rate] = avg
-            print(f"Saved results for mutation {rate} in {csv_file}")
-
-        # Best Fitness comparison
-        fig4 = plt.figure(figsize=(10, 6))
-        for rate, values in results_best.items():
-            plt.plot(values, label=f"Mutation {rate}")
-        plt.title("Best Fitness Comparison by Mutation Rate")
-        plt.xlabel("Generations")
-        plt.ylabel("Best Fitness")
-        plt.legend()
-        plt.show()
-        save_plot(fig4, "data", "comparison_best_fitness")
-
-        # Average Fitness comparison
-        fig5 = plt.figure(figsize=(10, 6))
-        for rate, values in results_avg.items():
-            plt.plot(values, label=f"Mutation {rate}")
-        plt.title("Average Fitness Comparison by Mutation Rate")
-        plt.xlabel("Generations")
-        plt.ylabel("Average Fitness")
-        plt.legend()
-        plt.show()
-        save_plot(fig5, "data", "comparison_avg_fitness")
-
+        print('Please enter "y" or "n"')
+        
 
 if __name__ == "__main__":
     main()
