@@ -131,12 +131,12 @@ def main():
     pos = nx.spring_layout(G)
     labels = nx.get_node_attributes(G, 'label')
 
-    fig1 = plt.figure(figsize=(12, 8))
+    fig1 = plt.figure(figsize=(10, 6))
     nx.draw(G, pos, with_labels=True, labels=labels,
             node_size=600, node_color="lightblue", font_size=8)
     plt.title("Genealogy of the Best Bee")
-    save_plot(fig1, folder, "genealogy_tree")
     plt.show()
+    save_plot(fig1, folder, "genealogy_tree")
 
     # -----------------------------
     # Graph 2: Best Path
@@ -153,8 +153,9 @@ def main():
     plt.title("Path of the Best Bee")
     plt.legend()
     plt.grid(True, linestyle="--", alpha=0.5)
-    save_plot(fig2, folder, "best_path")
     plt.show()
+    save_plot(fig2, folder, "best_path")
+    
 
     # -----------------------------
     # Graph 3: Fitness Evolution
@@ -166,8 +167,9 @@ def main():
     plt.xlabel("Generations")
     plt.ylabel("Fitness")
     plt.legend()
-    save_plot(fig3, folder, "fitness_evolution")
     plt.show()
+    save_plot(fig3, folder, "fitness_evolution")
+ 
 
     # -----------------------------
     # Ask for mutation comparison
@@ -194,8 +196,8 @@ def main():
         plt.xlabel("Generations")
         plt.ylabel("Best Fitness")
         plt.legend()
-        save_plot(fig4, "data", "comparison_best_fitness")
         plt.show()
+        save_plot(fig4, "data", "comparison_best_fitness")
 
         # Average Fitness comparison
         fig5 = plt.figure(figsize=(10, 6))
@@ -205,8 +207,8 @@ def main():
         plt.xlabel("Generations")
         plt.ylabel("Average Fitness")
         plt.legend()
-        save_plot(fig5, "data", "comparison_avg_fitness")
         plt.show()
+        save_plot(fig5, "data", "comparison_avg_fitness")
 
 
 if __name__ == "__main__":
