@@ -74,7 +74,8 @@ def run_simulation(mutation_rate, flowers, hive, pop_size, n_generations, geneal
 
 def save_plot(fig, folder, name):
     """Helper to save and close matplotlib figures as PNG"""
-    filepath = os.path.join(folder, f"{name}.png")
+    timestamp = datetime.datetime.now().strftime("%d%m%Y_%H%M%S")
+    filepath = os.path.join(folder, f"{name}_{timestamp}.png")
     fig.savefig(filepath, dpi=300, bbox_inches="tight")
     print(f"[Saved plot] {filepath}")
     plt.close(fig)
@@ -205,7 +206,7 @@ def main():
                     plt.ylabel("Best Fitness")
                     plt.legend()
                     plt.show()
-                    save_plot(fig4, "data", "comparison_best_fitness")
+                    save_plot(fig4, "data/comparison", "comparison_best_fitness")
 
                     # Average Fitness comparison
                     fig5 = plt.figure(figsize=(10, 6))
@@ -216,7 +217,7 @@ def main():
                     plt.ylabel("Average Fitness")
                     plt.legend()
                     plt.show()
-                    save_plot(fig5, "data", "comparison_avg_fitness")
+                    save_plot(fig5, "data/comparison", "comparison_avg_fitness")
 
 
     except ValueError:
