@@ -5,6 +5,7 @@ import csv
 import datetime
 import os
 from beehive import *
+random.seed(1234) 
 
 
 def run_simulation(mutation_rate, flowers, hive, pop_size, n_generations, genealogy=False):
