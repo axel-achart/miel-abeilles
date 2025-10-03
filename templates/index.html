@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Accueil - Miel-Abeilles{% endblock %}
+
+{% block content %}
+<h1>Exploration des résultats</h1>
+<ul>
+    {% for folder in mutation_folders %}
+    <li>
+        <a href="{{ url_for('explore') }}?mutation_folder={{ folder }}">{{ folder }}</a>
+    </li>
+    {% endfor %}
+</ul>
+<a href="{{ url_for('compare') }}">Comparer tous les taux de mutation</a>
+{% endblock %}

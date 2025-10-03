@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Exploration - {{ selected_folder }}{% endblock %}
+
+{% block content %}
+<h1>Exploration du dossier : {{ selected_folder }}</h1>
+<form method="post" id="form-selection">
+    <input type="hidden" name="prev_folder" value="{{ selected_folder }}">
+    <label for="mutation_folder">Taux de mutation :</label>
+    <select name="mutation_folder" id="mutation_folder" onchange="document.getElementById('form-selection').submit()">
+        {% for folder in mutation_folders %}
+        <option value="{{ folder }}" {% if folder == selected_folder %}selected{% endif %}>{{ folder }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="csv_file">Fichier :</label>
+    <select name="csv_file" id="csv_file" onchange="document.getElementById('form-selection').submit()">
+        {% for csv in csv_files %}
+        <option value="{{ csv }}" {% if csv == selected_csv %}selected{% endif %}>{{ csv }}</option>
+        {% endfor %}
+    </select>
+</form>
+
+<h2>Statistiques descriptives</h2>
+{{ desc|safe }}
+
+<h2>Evolution des scores</h2>
+<img src="data:image/png;base64,{{ plot_url }}" alt="Evolution des scores">
+
+<br>
+<a href="{{ url_for('index') }}">Retour à l'accueil</a>
+{% endblock %}
