@@ -36,7 +36,7 @@ def describe_results(df):
 
 def plot_evolution(df):
     plt.figure(figsize=(10,5))
-    plt.plot(df['Generation'], df['Best Distance'], label='Best Distance')
+    plt.plot(df['Generation'], df['Best Fitness'], label='Best Fitness')
     plt.plot(df['Generation'], df['Average Fitness'], label='Average Fitness')
     plt.xlabel('Generation')
     plt.ylabel('Score')
