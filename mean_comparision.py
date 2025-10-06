@@ -88,7 +88,7 @@ def main():
 def create_comparison_plots(processed_results, output_dir):
     print(f"\nCreating comparative visualizations...")
     fig, axes = plt.subplots(2, 2, figsize=(14, 10), constrained_layout=True)
-    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b',"#f1d42bff","#040680","#ee25d3"]
     # Plot 1: Best Distance
     ax = axes[0, 0]
     for i, (rate_name, df) in enumerate(sorted(processed_results.items())):
