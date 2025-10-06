@@ -1,0 +1,43 @@
+<h1>Comparaison des taux de mutation</h1>
+<h2>Courbe de convergence (Best Distance)</h2>
+<img src="data:image/png;base64,{{ plot_url }}" alt="Comparaison convergence">
+
+<!-- Formulaire de tri -->
+<form method="get" action="{{ url_for('compare') }}">
+    <label for="sort_by">Trier par :</label>
+    <select name="sort_by" id="sort_by">
+        <option value="Best Distance" {% if sort_by == 'Best Distance' %}selected{% endif %}>Best Distance</option>
+        <option value="Average Fitness" {% if sort_by == 'Average Fitness' %}selected{% endif %}>Average Fitness</option>
+    </select>
+
+    <label for="order">Ordre :</label>
+    <select name="order" id="order">
+        <option value="asc" {% if order == 'asc' %}selected{% endif %}>Croissant</option>
+        <option value="desc" {% if order == 'desc' %}selected{% endif %}>Décroissant</option>
+    </select>
+
+    <button type="submit">Trier</button>
+</form>
+
+<h2>Scores finaux</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Taux de mutation</th>
+            <th>Best Distance</th>
+            <th>Average Fitness</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for folder, stat in stats.items() %}
+        <tr>
+            <td>{{ folder }}</td>
+            <td>{{ stat['Best Distance'] }}</td>
+            <td>{{ stat['Average Fitness'] }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<a href="{{ url_for('index') }}">Retour à l'accueil</a>
