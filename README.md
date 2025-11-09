@@ -8,25 +8,38 @@ The project demonstrates how **natural selection** can be modeled computationall
 ---
 
 ## 🚀 Features
+
 ### Maze of Flowers (Problem Setting)
-- The hive is fixed.
-- Flowers are fixed in the field.
-- Bees must travel from the hive, visit all flowers, and return to the hive.
+
+| Element          | Description                                                        |
+|------------------|--------------------------------------------------------------------|
+| Hive             | Fixed position                                                     |
+| Flowers          | Fixed randomly in the field                                        |
+| Bees             | Must visit all flowers and return to the hive, optimizing the path |
 
 ### Genetic Algorithm
-- **Population**: initialized with random paths (permutations of flowers).
-- **Fitness**: inversely proportional to the total distance traveled.
-- **Selection**: elitist selection keeps the best bees.
-- **Crossover**: Order Crossover (OX).
-- **Mutation**: swap mutation with configurable probability.
+
+| Concept        | Description                                            |
+|----------------|--------------------------------------------------------|
+| Population     | Random paths (permutations of flowers)                 |
+| Fitness        | Inverse of total distance traveled                     |
+| Selection      | Elitist (best bees survive and reproduce)              |
+| Crossover      | Order Crossover (OX)                                   |
+| Mutation       | Swap mutation, probability is configurable             |
 
 ### Visualization
-- Path of the best bee in the final generation.
-- Performance curves (best fitness and average fitness across generations).
+
+| Visualization      | Feature                                                       |
+|--------------------|--------------------------------------------------------------|
+| Path display       | Shows best bee’s path at last generation                      |
+| Performance curves | Graphs for best and average fitness per generation            |
 
 ---
 
 ## 📊 Results
-- With low mutation, convergence is fast but risks stagnation.
-- With higher mutation, diversity is preserved but convergence is slower.
-- The **A* fitness evolution graph** shows performance improvement across generations.
+
+| Parameter            | Observation                                                      |
+|----------------------|------------------------------------------------------------------|
+| Mutation rate: Low   | Fast convergence, risk of premature stagnation                  |
+| Mutation rate: High  | Greater diversity, slower convergence                           |
+| Fitness curves       | A* performance plot shows fitness optimization over generations  |
