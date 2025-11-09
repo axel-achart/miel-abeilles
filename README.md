@@ -1,4 +1,4 @@
-# 🐝 Le Miel et les Abeilles
+# 🐝 Bees and honey
 
 ## 📖 Project Description
 The goal is to simulate the evolution of a colony of bees using a **genetic algorithm**, in order to optimize their foraging paths between a hive and a set of flowers.
